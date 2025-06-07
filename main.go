@@ -1,12 +1,46 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 // c is a gin context variable
 // It represents everything about the HTTP request and response in one place.
+
 func pingHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "pong",
+	})
+}
+
+func userHandler(c *gin.Context) {
+	var user = c.Param("user")
+	c.JSON(200, gin.H{
+		"message": user,
+	})
+}
+
+func handleSubmit(c *gin.Context) {
+
+	type user struct {
+		Email string `json:"email"  binding:"required"`
+		Age   int64  `json:"age" binding:"gte=18,lte=100"`
+	}
+
+	var u user
+
+	if err := c.BindJSON(&u); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"email": u.Email,
+		"age":   u.Age,
 	})
 }
 
@@ -17,11 +51,19 @@ func main() {
 		It automatically attaches two middleware:
 		Logger Middleware: logs every request to the console (method, path, status, latency).
 		Recovery Middleware: recovers from any panics and returns a 500 error instead of crashing your app.
+		A router is a component that maps incoming HTTP requests to the correct handler function in your code.
 	*/
 
 	router := gin.Default()
 
+	// basic route
 	router.GET("/ping", pingHandler)
+
+	// route with param
+	router.GET("/me/:user", userHandler)
+
+	// post
+	router.POST("/submit", handleSubmit)
 
 	router.Run(":3000")
 
