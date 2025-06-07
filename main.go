@@ -1,6 +1,7 @@
 package main
 
 import (
+	controllers "gin/Controllers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func handleSubmit(c *gin.Context) {
 
 	if err := c.BindJSON(&u); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -64,6 +65,12 @@ func main() {
 
 	// post
 	router.POST("/submit", handleSubmit)
+
+	notesController := &controllers.NotesController{}
+	notesController.InitNotesController(router)
+
+	notesController.GetNotes()
+	notesController.CreateNotes()
 
 	router.Run(":3000")
 
