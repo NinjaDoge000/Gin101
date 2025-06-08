@@ -10,13 +10,16 @@ import (
 // controllers Handles HTTP requests and delegates business logic to services.
 
 type NotesController struct {
-	notesService services.NotesService
+	notesService *services.NotesService
 }
 
-func (n *NotesController) InitNotesController(router *gin.Engine) {
+func (n *NotesController) InitNotesController(router *gin.Engine, notesService *services.NotesService) {
 	notes := router.Group("/notes")
 	notes.GET("/", n.GetNotes())
 	notes.POST("/", n.CreateNotes())
+
+	// register service
+	n.notesService = notesService
 }
 
 func (n *NotesController) GetNotes() gin.HandlerFunc {

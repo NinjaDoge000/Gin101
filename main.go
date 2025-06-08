@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	controllers "gin/Controllers"
+	services "gin/Services"
 	internal "gin/internal/database"
 	"net/http"
 
@@ -59,6 +60,15 @@ func main() {
 
 	router := gin.Default()
 
+	db := internal.InitDB()
+
+	if db == nil {
+		fmt.Print("Unable to connect to DB")
+	}
+
+	notesService := &services.NotesService{}
+	notesService.InitService(db)
+
 	// basic route
 	router.GET("/ping", pingHandler)
 
@@ -69,16 +79,10 @@ func main() {
 	router.POST("/submit", handleSubmit)
 
 	notesController := &controllers.NotesController{}
-	notesController.InitNotesController(router)
+	notesController.InitNotesController(router, notesService)
 
 	notesController.GetNotes()
 	notesController.CreateNotes()
-
-	db := internal.InitDB()
-
-	if db == nil {
-		fmt.Print("Unable to connect to DB")
-	}
 
 	router.Run(":3000")
 
