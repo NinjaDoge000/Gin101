@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	controllers "gin/Controllers"
+	internal "gin/internal/database"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -71,6 +73,12 @@ func main() {
 
 	notesController.GetNotes()
 	notesController.CreateNotes()
+
+	db := internal.InitDB()
+
+	if db == nil {
+		fmt.Print("Unable to connect to DB")
+	}
 
 	router.Run(":3000")
 
