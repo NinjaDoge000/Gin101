@@ -19,33 +19,33 @@ func (n *NotesService) InitService(database *gorm.DB) {
 	n.db.AutoMigrate(&internal.Notes{})
 }
 
-type notes struct {
-	Id   int
-	Name string
+// type notes struct {
+// 	Id   int
+// 	Name string
+// }
+
+func (n *NotesService) GetNotesSerivce(status bool) ([]*internal.Notes, error) {
+
+	var notes []*internal.Notes
+
+	if err := n.db.Where("status=?", status).Find(&notes).Error; err != nil {
+		return nil, err
+	}
+
+	return notes, nil
 }
 
-func (n *NotesService) GetNotesSerivce() []notes {
-	return []notes{
-		{Id: 1, Name: "note1"},
-		{Id: 2, Name: "note2"},
-		{Id: 3, Name: "note3"},
-	}
-}
+func (n *NotesService) CreateNotesSerivce(title string, status bool) (*internal.Notes, error) {
 
-func (n *NotesService) CreateNotesSerivce() notes {
-
-	err := n.db.Create(&internal.Notes{
-		Id:     1,
-		Title:  "Notes",
-		Status: true,
-	})
-
-	if err != nil {
-		fmt.Print(err)
+	notes := &internal.Notes{
+		Title:  title,
+		Status: status,
 	}
 
-	return notes{
-		Id:   1,
-		Name: "note1",
+	if result := n.db.Create(notes); result.Error != nil {
+		fmt.Println("error creating notes")
+		return nil, result.Error
 	}
+
+	return notes, nil
 }
