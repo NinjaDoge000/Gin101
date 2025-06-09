@@ -79,7 +79,8 @@ func main() {
 	router.POST("/submit", handleSubmit)
 
 	notesController := &controllers.NotesController{}
-	notesController.InitNotesController(router, notesService)
+	notesController.InitNotesController(notesService)
+	notesController.InitRouter(router)
 
 	notesController.GetNotes()
 	notesController.CreateNotes()

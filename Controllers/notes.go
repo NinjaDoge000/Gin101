@@ -15,15 +15,17 @@ type NotesController struct {
 	notesService *services.NotesService
 }
 
-func (n *NotesController) InitNotesController(router *gin.Engine, notesService *services.NotesService) {
+func (n *NotesController) InitNotesController(notesService *services.NotesService) {
+	// register service
+	n.notesService = notesService
+}
+
+func (n *NotesController) InitRouter(router *gin.Engine) {
 	notes := router.Group("/notes")
 	notes.GET("/", n.GetNotes())
 	notes.POST("/", n.CreateNotes())
 	notes.PUT("/", n.UpdateNotes())
 	notes.DELETE("/:id", n.DeleteNotes())
-
-	// register service
-	n.notesService = notesService
 }
 
 func (n *NotesController) GetNotes() gin.HandlerFunc {
@@ -31,6 +33,11 @@ func (n *NotesController) GetNotes() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		statusStr := c.Query("status")
+
+		if statusStr == "" {
+			statusStr = "False"
+		}
+
 		status, err := strconv.ParseBool(statusStr)
 
 		if err != nil {
