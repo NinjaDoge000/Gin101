@@ -85,6 +85,10 @@ func main() {
 	notesController.GetNotes()
 	notesController.CreateNotes()
 
+	authService := services.InitAuthService(db)
+	authController := controllers.InitAuthController(authService)
+	authController.InitRouter(router)
+
 	router.Run(":3000")
 
 }
